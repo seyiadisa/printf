@@ -1,6 +1,14 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-int _printf(const char *format, ...);
+#include <stdarg.h>
+#include <unistd.h>
 
-#endif 
+int _printf(const char *format, ...);
+int print_char(va_list args);
+int print_string(va_list args);
+int print_percent();
+int print_int(va_list args);
+int print_other(const char *format);
+char *itoa(int num, int base);
+#endif
