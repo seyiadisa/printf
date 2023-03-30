@@ -1,124 +1,66 @@
 #include "main.h"
 
-/**
- * itoa - Integer to ASCII. Converts an int to a string
- * @num: int
- * @base: number base
- *
- * Return: string representation of i
- */
-char *itoa(long num, int base)
-{
-	static char buf[64] = {0};
-	int i = 0, j = 0, k = 0;
-	int is_negative = 0;
-
-	if (num < 0)
-	{
-		is_negative = 1;
-		num *= -1;
-	}
-
-	while (num > 0)
-	{
-		int remainder = num % base;
-
-		if (remainder < 10)
-			buf[i++] = remainder + '0'; /* convert to ASCII code */
-		else
-			buf[i++] = "0123456789abcdef"[remainder];
-		num /= base;
-	}
-
-	if (is_negative)
-		buf[i++] = '-';
-
-	k = i - 1;
-	while (j < k)
-	{
-		char temp = buf[k];
-
-		buf[k--] = buf[j];
-		buf[j++] = temp;
-	}
-
-	buf[i] = '\0';
-
-	return (buf);
-}
+void print_buffer(char buffer[], int *buff_ind);
 
 /**
- * _printf - a function that produces output according to a format.
- * @format: string to print with support for conversion specifiers
- *
- * Return: number of bytes printed
+ * _printf - Printf function
+ * @format: format.
+ * Return: Printed chars.
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int count = 0;
+	int i, printed = 0, printed_chars = 0;
+	int flags, width, precision, size, buff_ind = 0;
+	va_list list;
+	char buffer[BUFF_SIZE];
 
-	va_start(args, format);
-	while (*format)
+	if (format == NULL)
+		return (-1);
+
+	va_start(list, format);
+
+	for (i = 0; format && format[i] != '\0'; i++)
 	{
-		if (*format == '%')
+		if (format[i] != '%')
 		{
-			format++;
-			count += handle_conversion(format, args);
+			buffer[buff_ind++] = format[i];
+			if (buff_ind == BUFF_SIZE)
+				print_buffer(buffer, &buff_ind);
+			/* write(1, &format[i], 1);*/
+			printed_chars++;
 		}
 		else
-			count += print_other(format);
-		format++;
+		{
+			print_buffer(buffer, &buff_ind);
+			flags = get_flags(format, &i);
+			width = get_width(format, &i, list);
+			precision = get_precision(format, &i, list);
+			size = get_size(format, &i);
+			++i;
+			printed = handle_print(format, &i, list, buffer,
+				flags, width, precision, size);
+			if (printed == -1)
+				return (-1);
+			printed_chars += printed;
+		}
 	}
-	va_end(args);
 
-	return (count);
+	print_buffer(buffer, &buff_ind);
+
+	va_end(list);
+
+	return (printed_chars);
 }
 
 /**
- * handle_conversion - a function that checks the specifiers.
- * @format: string to print with support for conversion specifiers
- * @args: arguments list
- *
- * Return: number of bytes printed
+ * print_buffer - Prints the contents of the buffer if it exist
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char, represents the length.
  */
-int handle_conversion(const char *format, va_list args)
+void print_buffer(char buffer[], int *buff_ind)
 {
-	int count = 0;
+	if (*buff_ind > 0)
+		write(1, &buffer[0], *buff_ind);
 
-	switch (*format)
-	{
-	case 'c':
-		count += print_char(args);
-		break;
-	case 's':
-		count += print_string(args);
-		break;
-	case '%':
-		count += print_percent();
-		break;
-	case 'd':
-	case 'i':
-		count += print_int(args);
-		break;
-	case 'b':
-		count += print_binary(args);
-		break;
-	case 'u':
-		count += print_unsigned_int(args);
-		break;
-	case 'o':
-		count += print_octal(args);
-		break;
-	case 'x':
-	case 'X':
-		count += print_hexadecimal(args, *format);
-		break;
-	default:
-		write(1, (char *) --format, 1);
-		count += print_other(++format);
-		break;
-	}
-
-	return (count);
+	*buff_ind = 0;
 }
