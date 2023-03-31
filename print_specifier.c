@@ -1,8 +1,8 @@
 #include "main.h"
 
 /**
- * print_char - Prints a char
- * @types: List a of arguments
+ * print_char - Prints a character
+ * @types: Lists of arguments
  * @buffer: Buffer array to handle print
  * @flags:  Calculates active flags
  * @width: Width
@@ -94,10 +94,9 @@ int print_percent(va_list types, char buffer[],
 	return (write(1, "%%", 1));
 }
 
-/************************* PRINT INT *************************/
 /**
- * print_int - Print int
- * @types: Lista of arguments
+ * print_int - Print integers
+ * @types: Lists of the arguments
  * @buffer: Buffer array to handle print
  * @flags:  Calculates active flags
  * @width: get width.
@@ -110,20 +109,20 @@ int print_int(va_list types, char buffer[],
 {
 	int i = BUFF_SIZE - 2;
 	int is_neg = 0;
-	long int n = va_arg(types, long int);
+	long int x = va_arg(types, long int);
 	unsigned long int num;
-	/* Convert the input number to the appropriate size */
-	n = convert_size_number(n, size);
-	/* If the number is zero, add a '0' character to the buffer. */
-	if (n == 0)
+	/* Convert input number to the appropriate size */
+	x = convert_size_number(x, size);
+	/* If number is zero, add a '0' character to the buffer. */
+	if (x == 0)
 		buffer[i--] = '0';
 	/* Set the last character of the buffer to a null terminator. */
 	buffer[BUFF_SIZE - 1] = '\0';
-	num = (unsigned long int)n;
+	num = (unsigned long int)x;
 
-	if (n < 0)
+	if (x < 0)
 	{
-		num = (unsigned long int)((-1) * n);
+		num = (unsigned long int)((-1) * x);
 		is_neg = 1;
 	}
 	/* Add the digits of the number to the buffer in reverse order. */
@@ -138,9 +137,8 @@ int print_int(va_list types, char buffer[],
 	return (write_number(is_neg, i, buffer, flags, width, precision, size));
 }
 
-/************************* PRINT BINARY *************************/
 /**
- * print_binary - Prints an unsigned number
+ * print_binary - Prints binary number
  * @types: Lista of arguments
  * @buffer: Buffer array to handle print
  * @flags:  Calculates active flags
@@ -152,7 +150,7 @@ int print_int(va_list types, char buffer[],
 int print_binary(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	unsigned int n, j, i, add;
+	unsigned int k, j, i, add;
 	unsigned int a[32];
 	int count;
 
@@ -162,13 +160,13 @@ int print_binary(va_list types, char buffer[],
 	UNUSED(precision);
 	UNUSED(size);
 
-	n = va_arg(types, unsigned int);
+	k = va_arg(types, unsigned int);
 	j = 2147483648; /* (2 ^ 31) */
-	a[0] = n / j;
+	a[0] = k / j;
 	for (i = 1; i < 32; i++)
 	{
 		j /= 2;
-		a[i] = (n / j) % 2;
+		a[i] = (k / j) % 2;
 	}
 	for (i = 0, add = 0, count = 0; i < 32; i++)
 	{
